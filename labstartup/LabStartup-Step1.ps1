@@ -3,7 +3,20 @@ Do {
     Test-TcpPortOpen -Server "esx-01.corp.local" -Port 22 -Result ([REF]$result)
     LabStartup-Sleep $sleepSeconds
 } Until ($result -eq "success")
+Do {
+    Test-TcpPortOpen -Server "esx-02.corp.local" -Port 22 -Result ([REF]$result)
+    LabStartup-Sleep $sleepSeconds
+} Until ($result -eq "success")
+Do {
+    Test-TcpPortOpen -Server "esx-03.corp.local" -Port 22 -Result ([REF]$result)
+    LabStartup-Sleep $sleepSeconds
+} Until ($result -eq "success")
+Do {
+    Test-TcpPortOpen -Server "esx-04.corp.local" -Port 22 -Result ([REF]$result)
+    LabStartup-Sleep $sleepSeconds
+} Until ($result -eq "success")
 
+Start-Sleep -Seconds 60
 # Recover vSAN
 While ($true) {
     Try {
@@ -13,7 +26,7 @@ While ($true) {
     Catch { LabStartup-Sleep $sleepSeconds }
 }
 
-# Check vSAN is ready
+# Check vSAN is ready - TODO
 Start-Sleep -Seconds 120
 Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
 Invoke-Plink -remoteHost esx-02.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
