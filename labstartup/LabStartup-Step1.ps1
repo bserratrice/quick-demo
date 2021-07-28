@@ -1,3 +1,20 @@
+# Recover vSAN
+Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "python /usr/lib/vmware/vsan/bin/reboot_helper.py recover"
+
+# Check vSAN is ready
+Start-Sleep -Seconds 120
+Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
+Invoke-Plink -remoteHost esx-02.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
+Invoke-Plink -remoteHost esx-03.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
+Invoke-Plink -remoteHost esx-04.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
+
+# Enable cluster member updates
+Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
+Invoke-Plink -remoteHost esx-02.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
+Invoke-Plink -remoteHost esx-03.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
+Invoke-Plink -remoteHost esx-04.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
+
+
 # wait for vcenter
 Write-VpodProgress "Checking vCenter Services" 'STARTING'
 
