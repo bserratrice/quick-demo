@@ -3,7 +3,6 @@ Get-Datastore esx-01-local-storage | Get-AlarmDefinition -Name "Datastore usage 
 Get-Datastore esx-02-wcp-supervisor-vm | Get-AlarmDefinition -Name "Datastore usage on disk" | Set-AlarmDefinition -enabled:$false | Out-Null
 Get-Datastore esx-03-wcp-supervisor-vm | Get-AlarmDefinition -Name "Datastore usage on disk" | Set-AlarmDefinition -enabled:$false | Out-Null
 Get-Datastore esx-04-wcp-supervisor-vm | Get-AlarmDefinition -Name "Datastore usage on disk" | Set-AlarmDefinition -enabled:$false | Out-Null
-Get-Datastore local_esx-05a | Get-AlarmDefinition -Name "Datastore usage on disk" | Set-AlarmDefinition -enabled:$false | Out-Null
 
 Write-Output "Disable Host memory usage alarm"
 Get-VMHost esx-01.corp.local | Get-AlarmDefinition -Name "Host memory usage" | Set-AlarmDefinition -enabled:$false | Out-Null
