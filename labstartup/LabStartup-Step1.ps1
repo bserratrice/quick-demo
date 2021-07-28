@@ -1,3 +1,9 @@
+# Wait for ESX-01
+Do {
+    Test-TcpPortOpen -Server "esx-01.corp.local" -Port 22 -Result ([REF]$result)
+    LabStartup-Sleep $sleepSeconds
+} Until ($result -eq "success")
+
 # Recover vSAN
 Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "python /usr/lib/vmware/vsan/bin/reboot_helper.py recover"
 
