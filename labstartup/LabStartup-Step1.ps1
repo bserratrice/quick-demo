@@ -5,7 +5,13 @@ Do {
 } Until ($result -eq "success")
 
 # Recover vSAN
-Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "python /usr/lib/vmware/vsan/bin/reboot_helper.py recover"
+While ($true) {
+    Try {
+        Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "python /usr/lib/vmware/vsan/bin/reboot_helper.py recover"
+        Break
+    }
+    Catch { LabStartup-Sleep $sleepSeconds }
+}
 
 # Check vSAN is ready
 Start-Sleep -Seconds 120
