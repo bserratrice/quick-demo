@@ -1,21 +1,12 @@
-# Wait for ESX-01
-Do {
-    Test-TcpPortOpen -Server "esx-01.corp.local" -Port 22 -Result ([REF]$result)
-    LabStartup-Sleep $sleepSeconds
-} Until ($result -eq "success")
-Do {
-    Test-TcpPortOpen -Server "esx-02.corp.local" -Port 22 -Result ([REF]$result)
-    LabStartup-Sleep $sleepSeconds
-} Until ($result -eq "success")
-Do {
-    Test-TcpPortOpen -Server "esx-03.corp.local" -Port 22 -Result ([REF]$result)
-    LabStartup-Sleep $sleepSeconds
-} Until ($result -eq "success")
-Do {
-    Test-TcpPortOpen -Server "esx-04.corp.local" -Port 22 -Result ([REF]$result)
-    LabStartup-Sleep $sleepSeconds
-} Until ($result -eq "success")
+Write-VpodProgress "Checking ESX and Start VSAN" 'STARTING'
 
+# Wait for ESX-01
+@("esx-01.corp.local", "esx-02.corp.local", "esx-03.corp.local", "esx-04.corp.local") | ForEach-Object {
+    Do {
+        Test-TcpPortOpen -Server $_ -Port 22 -Result ([REF]$result)
+        LabStartup-Sleep $sleepSeconds
+    } Until ($result -eq "success")
+}
 Start-Sleep -Seconds 60
 # Recover vSAN
 While ($true) {
@@ -26,19 +17,25 @@ While ($true) {
     Catch { LabStartup-Sleep $sleepSeconds }
 }
 
-# Check vSAN is ready - TODO
 Start-Sleep -Seconds 120
-Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
-Invoke-Plink -remoteHost esx-02.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
-Invoke-Plink -remoteHost esx-03.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
-Invoke-Plink -remoteHost esx-04.corp.local -login root -passwd VMware1! -command "esxcli vsan cluster get"
+
+# Connect to ESXi
+Connect-VIserver esx-01.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
+Connect-VIserver esx-02.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
+Connect-VIserver esx-03.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
+Connect-VIserver esx-04.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
+
+# Check vSAN is ready - TODO
+(Get-VMHost | Get-EsxCli -V2) | 
+ForEach-Object { $_.vsan.cluster.get.Invoke() } | 
+Select-Object LocalNodeUUID, LocalNodeHealthState, SubClusterMemberCount
 
 # Enable cluster member updates
-Invoke-Plink -remoteHost esx-01.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
-Invoke-Plink -remoteHost esx-02.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
-Invoke-Plink -remoteHost esx-03.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
-Invoke-Plink -remoteHost esx-04.corp.local -login root -passwd VMware1! -command "esxcfg-advcfg -s 0 /VSAN/IgnoreClusterMemberListUpdates"
-
+Get-VMHost | ForEach-Object { 
+    Get-AdvancedSetting -Name "VSAN.IgnoreClusterMemberListUpdates" -Entity $_ | 
+    Set-AdvancedSetting -Value 0 -Confirm:$false 
+}
+Disconnect-VIserver * -Confirm:$false | Out-Null
 
 # wait for vcenter
 Write-VpodProgress "Checking vCenter Services" 'STARTING'
@@ -86,3 +83,14 @@ Foreach ($entry in $vCenters) {
     Write-Output "Connection to vCenter OK, all AUTOMATIC services are started"
     $cisConnection | Disconnect-CisServer -Confirm:$false | Out-Null  2> $null
 }
+
+# Start Supervisor VM
+Connect-VIserver esx-02.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
+Connect-VIserver esx-03.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
+Connect-VIserver esx-04.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
+
+Get-VM | 
+Where-Object {$_.PowerState -eq "PoweredOff" -and ($_.Name -like "SupervisorControlPlaneVM*") } | 
+Start-VM -Confirm:$false
+
+Disconnect-VIserver * -Confirm:$false | Out-Null
