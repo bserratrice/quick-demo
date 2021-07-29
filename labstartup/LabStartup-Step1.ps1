@@ -33,7 +33,8 @@ Select-Object LocalNodeUUID, LocalNodeHealthState, SubClusterMemberCount
 # Enable cluster member updates
 Get-VMHost | ForEach-Object { 
     Get-AdvancedSetting -Name "VSAN.IgnoreClusterMemberListUpdates" -Entity $_ | 
-    Set-AdvancedSetting -Value 0 -Confirm:$false 
+    Set-AdvancedSetting -Value 0 -Confirm:$false | 
+    Select-Object Name, Value
 }
 Disconnect-VIserver * -Confirm:$false | Out-Null
 
@@ -60,10 +61,10 @@ Foreach ($entry in $vCenters) {
                 $vcsaServicesStoppedLog = ""
                 $vcsaServicesStopped | ForEach-Object {
                     $vcsaServicesStoppedLog += "$($_.Key) ($($_.Value.state)), "
-                    if ($_.Value.startup_type -eq "AUTOMATIC" -and $_.Value.state -eq "STOPPED") {
-                        Write-Output "Start Automatic service '$($_.Key)'"
-                        $applianceService.start($_.Key)
-                    }
+                    # if ($_.Value.startup_type -eq "AUTOMATIC" -and $_.Value.state -eq "STOPPED") {
+                    #     Write-Output "Start Automatic service '$($_.Key)'"
+                    #     $applianceService.start($_.Key)
+                    # }
                 }
                 Write-Output "Waiting for vCenter AUTOMATIC Services to start: $vcsaServicesStoppedLog"
                 if ($cisConnection) { $cisConnection | Disconnect-CisServer -Confirm:$false | Out-Null  2> $null }
