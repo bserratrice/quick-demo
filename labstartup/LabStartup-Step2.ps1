@@ -16,3 +16,14 @@ Get-Cluster "VMware-Cloud" | Get-AlarmDefinition -Name "vSAN Health Alarm 'vSAN 
 Get-Cluster "VMware-Cloud" | Get-AlarmDefinition -Name "vSAN Support Insight" | Set-AlarmDefinition -enabled:$false | Out-Null
 Get-Cluster "VMware-Cloud" | Get-AlarmDefinition -Name "vSAN hardware compatibility issues" | Set-AlarmDefinition -enabled:$false | Out-Null
 Get-Cluster "VMware-Cloud" | Get-AlarmDefinition -Name "vSAN health alarm 'Performance service status'" | Set-AlarmDefinition -enabled:$false | Out-Null
+
+Write-Output "Disable Network Alarms"
+Get-VMHost esx-01.corp.local | Get-AlarmDefinition -Name "Network connectivity lost" | Set-AlarmDefinition -enabled:$false | Out-Null
+Get-VMHost esx-02.corp.local | Get-AlarmDefinition -Name "Network connectivity lost" | Set-AlarmDefinition -enabled:$false | Out-Null
+Get-VMHost esx-03.corp.local | Get-AlarmDefinition -Name "Network connectivity lost" | Set-AlarmDefinition -enabled:$false | Out-Null
+Get-VMHost esx-04.corp.local | Get-AlarmDefinition -Name "Network connectivity lost" | Set-AlarmDefinition -enabled:$false | Out-Null
+
+Get-VMHost esx-01.corp.local | Get-AlarmDefinition -Name "Network uplink redundancy lost" | Set-AlarmDefinition -enabled:$false | Out-Null
+Get-VMHost esx-02.corp.local | Get-AlarmDefinition -Name "Network uplink redundancy lost" | Set-AlarmDefinition -enabled:$false | Out-Null
+Get-VMHost esx-03.corp.local | Get-AlarmDefinition -Name "Network uplink redundancy lost" | Set-AlarmDefinition -enabled:$false | Out-Null
+Get-VMHost esx-04.corp.local | Get-AlarmDefinition -Name "Network uplink redundancy lost" | Set-AlarmDefinition -enabled:$false | Out-Null
