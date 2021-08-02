@@ -1,6 +1,7 @@
 # Fix DRS issues
+Write-Output "Check DRS configuration issues"
 Get-VMHost | Where-Object {$_.ExtensionData.ConfigIssue.FullFormattedMessage -like "Unable to apply DRS*"} | ForEach-Object {
-    Write-Output "DRS issue with host $($_.Name), restarting hostd service."
+    Write-Output "DRS configuration issue for host $($_.Name), restarting hostd service."
     Invoke-Plink -remoteHost $_.Name -login root -passwd VMware1! -command "/etc/init.d/hostd restart"
     Do {
         Start-Sleep -Seconds 10
