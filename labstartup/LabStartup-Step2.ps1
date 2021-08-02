@@ -1,3 +1,12 @@
+# Fix DRS issues
+Get-VMHost | Where-Object {$_.ExtensionData.ConfigIssue.FullFormattedMessage -like "Unable to apply DRS*"} | ForEach-Object {
+    Write-Output "DRS issue with host $($_.Name), restarting hostd service."
+    Invoke-Plink -remoteHost $_.Name -login root -passwd VMware1! -command "/etc/init.d/hostd restart"
+    Do {
+        Start-Sleep -Seconds 10
+    } While ((Get-VMHost -Name esx-03.corp.local).ConnectionState -ne "Connected")
+}
+
 Write-Output "Disable datastore storage usage alarm"
 Get-Datastore esx-01-local-storage | Get-AlarmDefinition -Name "Datastore usage on disk" | Set-AlarmDefinition -enabled:$false | Out-Null
 Get-Datastore esx-02-wcp-supervisor-vm | Get-AlarmDefinition -Name "Datastore usage on disk" | Set-AlarmDefinition -enabled:$false | Out-Null
