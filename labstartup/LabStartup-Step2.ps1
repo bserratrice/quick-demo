@@ -1,3 +1,6 @@
+# Remove SDDC Mgr
+$global:VMS = $VMS | Where-Object { $_ -ne "sddc-mgr" }
+
 # Fix DRS issues
 Write-Output "Check DRS configuration issues"
 Get-VMHost | Where-Object { $_.ExtensionData.ConfigIssue.FullFormattedMessage -like "Unable to apply DRS*" } | ForEach-Object {
