@@ -1,1 +1,1 @@
-Get-VM "sddc-mgr" | Set-VM -MemoryGB 12 -Confirm:$false | Out-Null
+Get-VM "sddc-mgr" | Set-VM -MemoryGB 16 -Confirm:$false | Out-Null
