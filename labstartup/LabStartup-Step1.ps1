@@ -1,5 +1,6 @@
 WritePodSkuToDesktopInfo "VCPP Demo (VCD 10.3.0)"
 Write-VpodProgress "Checking ESX and Start VSAN" 'STARTING'
+Remove-Item -Path "C:\hol\labcheck.bat" -Force -Confirm:$false
 
 # Wait for ESX-01
 @("esx-01.corp.local", "esx-02.corp.local", "esx-03.corp.local", "esx-04.corp.local") | ForEach-Object {
