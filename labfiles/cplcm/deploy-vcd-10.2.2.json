@@ -1,0 +1,138 @@
+{
+    "environmentName": "vcpp-lab",
+    "products": [
+        {
+            "properties": {
+                "installationId": 1,
+                "systemName": "demo-vcd-1",
+                "dbPassword": "VMware1!",
+                "keystorePassword": "VMware1!",
+                "clusterFailoverMode": "MANUAL",
+                "publicAddress": {
+                    "consoleProxyExternalAddress": "vcd-02.corp.local:8443",
+                    "restApiBaseHttpUri": "http://vcd-02.corp.local",
+                    "restApiBaseUri": "https://vcd-02.corp.local",
+                    "tenantPortalExternalHttpAddress": "http://vcd-02.corp.local",
+                    "tenantPortalExternalAddress": "https://vcd-02.corp.local"
+                },
+                "adminEmail": "admin@vcpp.lab",
+                "adminFullName": "admin",
+                "nfsMount": "192.168.110.60:/mnt/HOL/vcd2",
+                "deploymentOption": "primary-small"
+            },
+            "certificate": {
+                "product": {
+                    "certificate": "",
+                    "privateKey": ""
+                },
+                "management": {
+                    "certificate": "",
+                    "privateKey": ""
+                }
+            },
+            "integrations": [
+                {
+                    "integrationId": "vmware-cloud",
+                    "datacenterComponentType": "VCENTER",
+                    "hostname": "vcenter.corp.local",
+                    "integrationUsername": "administrator@vsphere.local",
+                    "integrationPassword": "VMware1!",
+                    "properties": {
+                        "providerVdcs": {
+                            "vmware-cloud-vcf": {
+                                "description": "VMware Cloud",
+                                "highestSupportedHardwareVersion": "vmx-17`",
+                                "isEnabled": true,
+                                "clusterName": "VMware-Cloud",
+                                "resourcePoolname": "Workloads",
+                                "nsxIntegration": "vmware-nsx",
+                                "storageProfile": [
+                                    "lab-shared-storage",
+                                    "vSAN Default Storage Policy"
+                                ],
+                                "networkPoolname": "lab-pool"
+                            }
+                        }
+                    }
+                },
+                {
+                    "integrationId": "vmware-nsx",
+                    "datacenterComponentType": "NSXT",
+                    "hostname": "nsx-mgr.corp.local",
+                    "integrationUsername": "admin",
+                    "integrationPassword": "VMware1!VMware1!",
+                    "properties": {
+                        "networkPools": {
+                            "lab-pool": "tz-overlay"
+                        }
+                    }
+                }
+            ],
+            "productType": "VCD",
+            "productId": "vcd",
+            "version": "10.2.2",
+            "license": "{{vcd_license}}",
+            "adminPassword": "VMware1!",
+            "nodes": [
+                {
+                    "hostName": "vcd-02.corp.local",
+                    "vmName": "vcd-02",
+                    "rootPassword": "VMware1!",
+                    "gateway": "192.168.110.1",
+                    "nics": [
+                        {
+                            "ipAddress": "192.168.110.52",
+                            "networkName": "vcd-dmz-nw",
+                            "staticRoutes": []
+                        },
+                        {
+                            "ipAddress": "10.10.20.52",
+                            "networkName": "vcd-mgmt-nw",
+                            "staticRoutes": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "deploymentInfrastructures": {
+        "infra1": {
+            "vcenter": {
+                "vcenterName": "mgmt-vc",
+                "vcenterHost": "vcenter.corp.local",
+                "vcenterUsername": "administrator@vsphere.local",
+                "vcenterPassword": "VMware1!",
+                "datacenterName": "vcpp-dc01",
+                "clusterName": "VMware-Cloud",
+                "resourcePool": "Management",
+                "datastores": [
+                    "iscsi-storage"
+                ],
+                "networks": {
+                    "vcd-dmz-nw": {
+                        "portGroupName": "vcf-management",
+                        "gateway": "192.168.110.1",
+                        "subnetMask": "255.255.255.0",
+                        "domainName": "corp.local",
+                        "searchPath": [
+                            "corp.local"
+                        ],
+                        "useDhcp": false,
+                        "dns": [
+                            "192.168.110.10"
+                        ],
+                        "ntp": [
+                            "192.168.100.1"
+                        ]
+                    },
+                    "vcd-mgmt-nw": {
+                        "portGroupName": "vcf-management",
+                        "gateway": "10.10.20.1",
+                        "subnetMask": "255.255.255.0",
+                        "useDhcp": false
+                    }
+                }
+            }
+        }
+    }
+}
