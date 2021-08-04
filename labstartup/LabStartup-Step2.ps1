@@ -1,6 +1,3 @@
-# Apply Hotfix
-& (Join-Path $PSScriptRoot "HotFix-Step2.ps1")
-
 # Fix DRS issues
 Write-Output "Check DRS configuration issues"
 Get-VMHost | Where-Object { $_.ExtensionData.ConfigIssue.FullFormattedMessage -like "Unable to apply DRS*" } | ForEach-Object {
