@@ -1,3 +1,4 @@
+WritePodSkuToDesktopInfo "VCPP Demo (VCD 10.3.0)"
 Write-VpodProgress "Checking ESX and Start VSAN" 'STARTING'
 
 # Wait for ESX-01
