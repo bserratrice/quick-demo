@@ -20,16 +20,6 @@
                 "nfsMount": "192.168.110.60:/mnt/HOL/vcd2",
                 "deploymentOption": "primary-small"
             },
-            "certificate": {
-                "product": {
-                    "certificate": "",
-                    "privateKey": ""
-                },
-                "management": {
-                    "certificate": "",
-                    "privateKey": ""
-                }
-            },
             "integrations": [
                 {
                     "integrationId": "vmware-cloud",
