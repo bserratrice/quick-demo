@@ -1,6 +1,4 @@
-WritePodSkuToDesktopInfo "VCPP Demo (VCD 10.3.0)"
 Write-VpodProgress "Checking ESX and Start VSAN" 'STARTING'
-Remove-Item -Path "C:\hol\labcheck.bat" -Force -Confirm:$false
 
 # Wait for ESX-01
 @("esx-01.corp.local", "esx-02.corp.local", "esx-03.corp.local", "esx-04.corp.local") | ForEach-Object {
@@ -38,6 +36,7 @@ Get-VMHost | ForEach-Object {
     Set-AdvancedSetting -Value 0 -Confirm:$false | 
     Select-Object Name, Value
 }
+
 Disconnect-VIserver * -Confirm:$false | Out-Null
 
 # wait for vcenter
@@ -87,13 +86,24 @@ Foreach ($entry in $vCenters) {
     $cisConnection | Disconnect-CisServer -Confirm:$false | Out-Null  2> $null
 }
 
-# Start Supervisor VM
+# Start Supervisor VM & TKC VMs
+Connect-VIserver esx-01.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
 Connect-VIserver esx-02.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
 Connect-VIserver esx-03.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
 Connect-VIserver esx-04.corp.local -username root -password VMware1! -ErrorAction SilentlyContinue
 
 Get-VM | 
-Where-Object {$_.PowerState -eq "PoweredOff" -and ($_.Name -like "SupervisorControlPlaneVM*") } | 
-Start-VM -Confirm:$false
+Where-Object { $_.PowerState -eq "PoweredOff" -and ($_.Name -like "SupervisorControlPlaneVM*") } | 
+ForEach-Object {
+    Write-Output "Start VM ${$_.Name}"
+    Start-VM -VM $_ -Confirm:$false
+}
+
+Get-VM | 
+Where-Object { $_.PowerState -eq "PoweredOff" -and ($_.Name -like "knowhere*") } | 
+ForEach-Object {
+    Write-Output "Start VM ${$_.Name}"
+    Start-VM -VM $_ -Confirm:$false
+}
 
 Disconnect-VIserver * -Confirm:$false | Out-Null
